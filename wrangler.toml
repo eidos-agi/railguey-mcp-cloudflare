@@ -1,0 +1,18 @@
+# Worker script name must stay `railguey` — it is the live Workers.dev host
+# (railguey.eidos-agi.workers.dev) and Cloudflare Builds requires the
+# dashboard Worker name to match wrangler `name`.
+name = "railguey"
+main = "index.js"
+compatibility_date = "2025-04-01"
+workers_dev = true
+account_id = "3c1d42c77978e6af0e458b6f1130c01b"
+
+# Secrets (set via dashboard / API, never committed):
+#   MCP_AUTH_TOKEN
+#
+# KV holds paired Railway accounts (tokens never committed):
+#   ACCOUNTS = railguey-accounts
+
+[[kv_namespaces]]
+binding = "ACCOUNTS"
+id = "231552b750634db3b0e1f636937fc9a7"
