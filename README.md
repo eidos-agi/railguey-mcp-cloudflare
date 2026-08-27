@@ -45,14 +45,11 @@ This matches the CLI model (`~/.railguey/accounts.json`) — named accounts, one
 - `GET /pair` — enter a claim code
 - `GET|POST /pair/:code` — paste a Railway token
 - `POST /mcp` — MCP Streamable HTTP (auth required)
-- `GET /__git` — which GitHub SHA the live Worker is running
-- `POST /__sync` — pull `main` now (GitHub Actions does this on every push)
 
 ## Secrets and bindings
 
 - `MCP_AUTH_TOKEN` — bearer Grok sends as `Authorization: Bearer …`
-- KV `ACCOUNTS` (`railguey-accounts`) — paired Railway tokens, claim codes, default slug, plus `git:sha` / `git:code`
-- `LOADER` — Dynamic Worker Loader; runs `index.js` from git
+- KV `ACCOUNTS` (`railguey-accounts`) — paired Railway tokens, claim codes, default slug
 
 Never commit tokens. `wrangler.toml` only has the KV namespace id and Cloudflare account id.
 
@@ -65,15 +62,15 @@ Never commit tokens. `wrangler.toml` only has the KV namespace id and Cloudflare
 
 ## Deploy
 
-**`git push` to `main` is the deploy.** The live Worker is a git-attached loader:
+**`git push` to `main` is the deploy.** This repo is permanently attached to the live Worker:
 
-1. `loader.js` is the Cloudflare script (KV + Worker Loader + cron).
-2. On push, GitHub Actions POSTs `/__sync`. The loader fetches `index.js` from this repo’s `main` and runs it.
-3. A `*/5 * * * *` cron is the backup if Actions is delayed.
+1. Push to `eidos-agi/railguey-mcp-cloudflare` `main` (especially `index.js`).
+2. Grok automation `railguey-git-deploy` fires on that push, uploads `index.js` to Worker `railguey`, and keeps KV + `MCP_AUTH_TOKEN`.
+3. Hourly backup redeploys `main` if a push event is missed.
 
-No Cloudflare API token. No Cloudflare GitHub App. Changing MCP behavior means editing `index.js` and pushing.
+No Cloudflare API token in GitHub. No Cloudflare GitHub App. Changing MCP behavior means editing `index.js` and pushing.
 
-`GET /__git` shows the SHA currently loaded.
+`loader.js` is a Dynamic Worker Loader (git-pull at the edge). It is **not live** — this Cloudflare account is on the free Workers plan (API 10195). `wrangler.toml` `main` stays `index.js`.
 
 `name = "railguey"` must not change. Renaming the Worker would break the live host and Grok’s connector URL.
 

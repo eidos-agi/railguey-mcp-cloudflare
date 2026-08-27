@@ -1,10 +1,13 @@
 /**
- * Git-attached loader for railguey.
- * The MCP implementation lives in index.js on GitHub. This Worker pulls
- * eidos-agi/railguey-mcp-cloudflare@main and runs it. git push is the deploy.
+ * Git-attached loader for railguey — NOT LIVE on this account.
  *
- * /__sync and the 5-minute cron only ever load public `main`. Posted SHAs are
- * a hint to skip a no-op; they cannot point the isolate at another branch.
+ * Cloudflare rejected the worker_loader binding with 10195
+ * (Dynamic Workers requires a paid Workers plan). Live deploys
+ * upload index.js instead, via Grok automation railguey-git-deploy
+ * on push to eidos-agi/railguey-mcp-cloudflare@main.
+ *
+ * Keep this file. If the account is upgraded, wrangler.toml main
+ * can point here and the isolate will pull index.js from git.
  */
 const REPO = "eidos-agi/railguey-mcp-cloudflare";
 const BRANCH = "main";
