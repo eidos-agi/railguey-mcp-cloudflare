@@ -1,4 +1,4 @@
-name: Deploy Worker
+name: Sync Worker
 
 on:
   push:
@@ -10,15 +10,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+  sync:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: "3c1d42c77978e6af0e458b6f1130c01b"
-          command: deploy
+      - name: Pull main onto railguey.eidos-agi.workers.dev
+        run: |
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+          curl -sS -X POST "https://railguey.eidos-agi.workers.dev/__sync" \
+            -H "Content-Type: application/json" \
+            --data "{\"sha\":\"${GITHUB_SHA}\"}" | tee /tmp/sync.json
+          python3 -c "import json,sys; d=json.load(open('/tmp/sync.json')); print(d); sys.exit(0 if d.get('ok') else 1)"

@@ -2,17 +2,24 @@
 # (railguey.eidos-agi.workers.dev) and Cloudflare Builds requires the
 # dashboard Worker name to match wrangler `name`.
 name = "railguey"
-main = "index.js"
-compatibility_date = "2025-04-01"
+main = "loader.js"
+compatibility_date = "2026-06-24"
 workers_dev = true
 account_id = "3c1d42c77978e6af0e458b6f1130c01b"
 
+# loader.js pulls index.js from GitHub main and runs it. git push is the deploy.
 # Secrets (set via dashboard / API, never committed):
 #   MCP_AUTH_TOKEN
 #
-# KV holds paired Railway accounts (tokens never committed):
+# KV holds paired Railway accounts (tokens never committed) plus git:sha/git:code:
 #   ACCOUNTS = railguey-accounts
 
 [[kv_namespaces]]
 binding = "ACCOUNTS"
 id = "231552b750634db3b0e1f636937fc9a7"
+
+[[worker_loaders]]
+binding = "LOADER"
+
+[triggers]
+crons = ["*/5 * * * *"]
